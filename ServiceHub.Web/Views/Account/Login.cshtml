@@ -1,0 +1,61 @@
+@using Microsoft.AspNetCore.Authentication
+@model ServiceHub.Web.Models.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Log in";
+    var externalLogins = ViewData["ExternalLogins"] as IList<AuthenticationScheme> ?? [];
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm auth-card">
+            <div class="card-body p-4">
+                <h1 class="h3 mb-3">Log in</h1>
+                @if (TempData["ErrorMessage"] is string errorMessage)
+                {
+                    <div class="alert alert-danger">@errorMessage</div>
+                }
+                <form asp-action="Login" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                    <input type="hidden" asp-for="ReturnUrl" />
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" autocomplete="username" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" class="form-control" autocomplete="current-password" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input asp-for="RememberMe" class="form-check-input" />
+                        <label asp-for="RememberMe" class="form-check-label"></label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Log in</button>
+                </form>
+                <p class="mt-3 mb-0">
+                    <a asp-action="ForgotPassword">Forgot your password?</a>
+                </p>
+                <p class="mt-2 mb-0">
+                    New to ServiceHub? <a asp-action="Register">Create an account</a>
+                </p>
+                @if (externalLogins.Count > 0)
+                {
+                    <hr />
+                    <form asp-action="ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                        @foreach (var provider in externalLogins)
+                        {
+                            <button type="submit" class="btn btn-outline-danger w-100" name="provider" value="@provider.Name">
+                                Continue with @provider.DisplayName
+                            </button>
+                        }
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

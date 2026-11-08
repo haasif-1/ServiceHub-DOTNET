@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ServiceHub.Web/ServiceHub.Web.csproj" />
+  <Project Path="ServiceHub.Web.Tests/ServiceHub.Web.Tests.csproj" />
+</Solution>

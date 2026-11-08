@@ -1,0 +1,9 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="py-4">
+    <h1 class="h3">Hello, @ViewData["FullName"]</h1>
+    <p class="text-muted">You are signed in@(string.IsNullOrWhiteSpace(ViewData["Roles"] as string) ? "." : $" as {ViewData["Roles"]}.")</p>
+    <p>This dashboard is protected by ASP.NET Core Identity cookie authentication & Developed BY CINAH's .</p>
+</div>
