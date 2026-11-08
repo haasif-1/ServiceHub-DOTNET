@@ -60,4 +60,3 @@ The Google button appears on the login page only after both values are set.
 - Password reset emails are written to the application log in this phase. Use the logged link to open `/Account/ResetPassword`.
 - New users choose Customer or ServiceProvider. Admin is not publicly selectable; the initial Admin account is created only when both secure configuration values are present.
 
-Production secrets belong in the host environment (`ConnectionStrings__DefaultConnection`, `admin@gmail.com`, `<HuAs@20537>`, `Jwt__Key`, `Authentication__Google__ClientId`, `Authentication__Google__ClientSecret`). Apply migrations during deployment before starting the app; keep `ApplyMigrationsOnStartup` false unless you explicitly want startup migrations in that environment.
