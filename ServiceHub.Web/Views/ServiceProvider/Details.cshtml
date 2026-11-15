@@ -1,0 +1,36 @@
+@model ServiceHub.Web.Models.ViewModels.ProviderServiceViewModel
+@{
+    ViewData["Title"] = "Service Details";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <a asp-action="Services" class="text-decoration-none">&larr; My services</a>
+        <article class="card shadow-sm mt-3">
+            <div class="card-body p-4">
+                <div class="d-flex flex-column flex-sm-row justify-content-between gap-3">
+                    <div>
+                        <p class="text-uppercase text-primary fw-semibold mb-2">Service details</p>
+                        <h1 class="h2">@Model.ServiceName</h1>
+                    </div>
+                    <span class="badge align-self-start @(Model.IsActive ? "text-bg-success" : "text-bg-secondary")">
+                        @(Model.IsActive ? "Active" : "Inactive")
+                    </span>
+                </div>
+                <p class="text-muted">@(Model.Description ?? "No description provided.")</p>
+                <dl class="row mt-4">
+                    <dt class="col-sm-4">Price</dt>
+                    <dd class="col-sm-8">@Model.Price.ToString("0.00")</dd>
+                    <dt class="col-sm-4">Estimated duration</dt>
+                    <dd class="col-sm-8">@Model.EstimatedDurationMinutes minutes</dd>
+                    <dt class="col-sm-4">Last updated</dt>
+                    <dd class="col-sm-8">@Model.UpdatedAtUtc.ToLocalTime().ToString("g")</dd>
+                </dl>
+                <div class="d-flex gap-2">
+                    <a asp-action="EditService" asp-route-id="@Model.Id" class="btn btn-primary">Edit service</a>
+                    <a asp-action="DeleteService" asp-route-id="@Model.Id" class="btn btn-outline-danger">Delete</a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>

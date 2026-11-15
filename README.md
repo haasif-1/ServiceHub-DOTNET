@@ -32,6 +32,12 @@ The Admin password must be at least 8 characters and contain uppercase, lowercas
 
 The Admin email and password are read only from secure configuration. Public registration permits `Customer` and `ServiceProvider` accounts only.
 
+### Service Provider services
+
+Service Providers can create, view, edit, activate/deactivate, and delete their own offered services from `/ServiceProvider/Dashboard`. Services are stored in MySQL with Dapper and linked to the Identity user by a foreign key. Identity and schema migrations remain managed by EF Core. Providers must use the MySQL-backed Development configuration above; their service queries are always scoped to the signed-in Identity user.
+
+The versioned `AddProviderServices` migration creates the services table. In Development it is applied on startup; in other environments, apply migrations before deployment as described above. No profile or Identity account delete operation is included in this phase.
+
 ### JWT API
 
 ```bash
@@ -60,4 +66,4 @@ The Google button appears on the login page only after both values are set.
 - Password reset emails are written to the application log in this phase. Use the logged link to open `/Account/ResetPassword`.
 - New users choose Customer or ServiceProvider. Admin is not publicly selectable; the initial Admin account is created only when both secure configuration values are present.
 
-Production secrets belong in the host environment (`ConnectionStrings__DefaultConnection`, `admin@gmail.com`, `<HuAs@20537>`, `Jwt__Key`, `Authentication__Google__ClientId`, `Authentication__Google__ClientSecret`). Apply migrations during deployment before starting the app; keep `ApplyMigrationsOnStartup` false unless you explicitly want startup migrations in that environment.
+Production secrets belong in the host environment (`ConnectionStrings__DefaultConnection`, `InitialAdmin__Email`, `InitialAdmin__Password`, `Jwt__Key`, `Authentication__Google__ClientId`, `Authentication__Google__ClientSecret`). Apply migrations during deployment before starting the app; keep `ApplyMigrationsOnStartup` false unless you explicitly want startup migrations in that environment.

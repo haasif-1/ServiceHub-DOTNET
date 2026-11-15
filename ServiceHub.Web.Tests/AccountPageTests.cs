@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceHub.Web.Data;
@@ -34,11 +35,13 @@ public class AccountPageTests : IClassFixture<ServiceHubWebApplicationFactory>
     public async Task Startup_seeds_exactly_the_supported_roles()
     {
         using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var roles = roleManager.Roles
             .Select(role => role.Name ?? string.Empty)
             .ToArray();
 
+        Assert.True(db.Database.IsInMemory());
         Assert.Equal(
             new[] { AppRoles.Admin, AppRoles.Customer, AppRoles.ServiceProvider }.OrderBy(role => role, StringComparer.Ordinal),
             roles.OrderBy(role => role, StringComparer.Ordinal));
@@ -127,6 +130,18 @@ public class AccountPageTests : IClassFixture<ServiceHubWebApplicationFactory>
         var dashboardHtml = await dashboardResponse.Content.ReadAsStringAsync();
         Assert.Contains("Taylor Service", dashboardHtml);
         Assert.Contains(expectedRole, dashboardHtml);
+
+        var serviceCreationResponse = await client.GetAsync("/ServiceProvider/Services/Create");
+        if (role == AppRoles.ServiceProvider)
+        {
+            Assert.Equal(HttpStatusCode.OK, serviceCreationResponse.StatusCode);
+            Assert.Contains("Add a service", await serviceCreationResponse.Content.ReadAsStringAsync());
+        }
+        else
+        {
+            Assert.Equal(HttpStatusCode.Redirect, serviceCreationResponse.StatusCode);
+            Assert.Equal("/Account/AccessDenied", serviceCreationResponse.Headers.Location?.AbsolutePath);
+        }
 
         var authenticatedLoginResponse = await client.GetAsync("/Account/Login");
         Assert.Equal(HttpStatusCode.Redirect, authenticatedLoginResponse.StatusCode);

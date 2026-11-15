@@ -1,0 +1,28 @@
+@model ServiceHub.Web.Models.ViewModels.ProviderServiceViewModel
+@{
+    ViewData["Title"] = "Delete Service";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card border-danger shadow-sm mt-4">
+            <div class="card-body p-4">
+                <h1 class="h3 text-danger">Delete service?</h1>
+                <p>
+                    This will permanently delete <strong>@Model.ServiceName</strong>.
+                    This action cannot be undone.
+                </p>
+                <dl class="row">
+                    <dt class="col-sm-4">Price</dt>
+                    <dd class="col-sm-8">@Model.Price.ToString("0.00")</dd>
+                    <dt class="col-sm-4">Duration</dt>
+                    <dd class="col-sm-8">@Model.EstimatedDurationMinutes minutes</dd>
+                </dl>
+                <form asp-action="ConfirmDeleteService" asp-route-id="@Model.Id" method="post">
+                    <button type="submit" class="btn btn-danger">Delete service</button>
+                    <a asp-action="Services" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

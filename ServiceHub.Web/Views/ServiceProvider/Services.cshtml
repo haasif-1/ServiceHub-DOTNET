@@ -1,0 +1,70 @@
+@model IReadOnlyList<ServiceHub.Web.Models.ViewModels.ProviderServiceViewModel>
+@{
+    ViewData["Title"] = "My Services";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <a asp-action="Dashboard" class="text-decoration-none">&larr; Dashboard</a>
+        <h1 class="h2 mt-2 mb-0">My services</h1>
+    </div>
+    <a asp-action="CreateService" class="btn btn-primary">Add a service</a>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success" role="status">@successMessage</div>
+}
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-danger" role="alert">@errorMessage</div>
+}
+
+@if (Model.Count == 0)
+{
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <h2 class="h4">No services yet</h2>
+            <p class="text-muted">Add the services you offer to manage them here.</p>
+            <a asp-action="CreateService" class="btn btn-primary">Add your first service</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Service</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Duration</th>
+                    <th scope="col">Status</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var service in Model)
+                {
+                    <tr>
+                        <th scope="row">@service.ServiceName</th>
+                        <td>@service.Price.ToString("0.00")</td>
+                        <td>@service.EstimatedDurationMinutes min</td>
+                        <td>
+                            <span class="badge @(service.IsActive ? "text-bg-success" : "text-bg-secondary")">
+                                @(service.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Actions for @service.ServiceName">
+                                <a asp-action="ServiceDetails" asp-route-id="@service.Id" class="btn btn-outline-secondary">Details</a>
+                                <a asp-action="EditService" asp-route-id="@service.Id" class="btn btn-outline-primary">Edit</a>
+                                <a asp-action="DeleteService" asp-route-id="@service.Id" class="btn btn-outline-danger">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

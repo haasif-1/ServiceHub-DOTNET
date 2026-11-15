@@ -1,11 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using ServiceHub.Web.Data;
 using ServiceHub.Web.Extensions;
+using ServiceHub.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddServiceHubIdentity(builder.Configuration);
+builder.Services.AddSingleton<IMySqlConnectionFactory, MySqlConnectionFactory>();
+builder.Services.AddScoped<ProviderServicesService>();
 
 var app = builder.Build();
 
