@@ -4,27 +4,39 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ServiceHub</title>
-    <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ServiceHub.Web.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ServiceHub</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+<body class="d-flex flex-column min-vh-100 bg-light-subtle">
+    <header class="sticky-top bg-white border-bottom shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-light py-2">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-primary" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="brand-icon d-inline-flex align-items-center justify-content-center bg-primary text-white rounded p-1" style="width: 28px; height: 28px;">
+                        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l1.146.847a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5Z"/>
+                        </svg>
+                    </span>
+                    <span>ServiceHub</span>
+                </a>
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                        aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+                        @if (User.IsInRole(ServiceHub.Web.Models.AppRoles.ServiceProvider))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="ServiceProvider" asp-action="Services">Services</a>
+                            </li>
+                        }
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />
@@ -32,19 +44,51 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
+    @if (ViewData["HeaderTitle"] is string headerTitle)
+    {
+        <div class="bg-white border-bottom py-3 mb-4 shadow-xs">
+            <div class="container">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <div>
+                        <h1 class="h3 mb-1 text-dark">@headerTitle</h1>
+                        @if (ViewData["HeaderSubtitle"] is string subtitle)
+                        {
+                            <p class="text-muted mb-0 small">@subtitle</p>
+                        }
+                    </div>
+                    @RenderSection("HeaderActions", required: false)
+                </div>
+            </div>
+        </div>
+    }
+
+    <main role="main" class="flex-grow-1 py-4">
         <div class="container">
-            &copy; 2026 - ServiceHub - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <partial name="_NotificationPartial" />
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="mt-auto bg-white border-top py-4 text-muted">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2 text-center text-md-start">
+                    <span class="fw-semibold text-dark">ServiceHub</span>
+                    <span>&middot;</span>
+                    <span class="small">Home Service Booking &amp; Management System</span>
+                </div>
+                <div class="small text-center text-md-end">
+                    &copy; @DateTime.UtcNow.Year ServiceHub &middot;
+                    <a asp-controller="Home" asp-action="Privacy" class="text-muted text-decoration-none">Privacy</a>
+                </div>
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/servicehub-ajax.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

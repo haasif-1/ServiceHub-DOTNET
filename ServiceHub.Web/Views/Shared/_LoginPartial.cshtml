@@ -3,35 +3,104 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-<ul class="navbar-nav">
+<ul class="navbar-nav align-items-lg-center gap-1">
     @if (SignInManager.IsSignedIn(User))
     {
         var currentUser = await UserManager.GetUserAsync(User);
-        var dashboardPath = User.IsInRole(AppRoles.Admin)
-            ? "/Admin/Dashboard"
-            : User.IsInRole(AppRoles.Customer)
-                ? "/Customer/Dashboard"
-                : User.IsInRole(AppRoles.ServiceProvider)
-                    ? "/ServiceProvider/Dashboard"
-                    : "/Account/AccessDenied";
-        <li class="nav-item">
-            <a class="nav-link text-dark" href="@dashboardPath">
-                @(currentUser?.FullName ?? currentUser?.Email ?? "Account")
+        var displayName = !string.IsNullOrWhiteSpace(currentUser?.FullName)
+            ? currentUser.FullName
+            : (currentUser?.Email ?? "My Account");
+
+        string dashboardPath;
+        string roleBadge;
+        string badgeClass;
+
+        if (User.IsInRole(AppRoles.Admin))
+        {
+            dashboardPath = "/Admin/Dashboard";
+            roleBadge = "Admin";
+            badgeClass = "bg-danger";
+        }
+        else if (User.IsInRole(AppRoles.Customer))
+        {
+            dashboardPath = "/Customer/Dashboard";
+            roleBadge = "Customer";
+            badgeClass = "bg-info text-dark";
+        }
+        else if (User.IsInRole(AppRoles.ServiceProvider))
+        {
+            dashboardPath = "/ServiceProvider/Dashboard";
+            roleBadge = "Provider";
+            badgeClass = "bg-primary";
+        }
+        else
+        {
+            dashboardPath = "/Account/AccessDenied";
+            roleBadge = "User";
+            badgeClass = "bg-secondary";
+        }
+
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-dark px-2" href="#" id="userMenuDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="user-avatar-circle">
+                    @(displayName.Length > 0 ? displayName[0].ToString().ToUpper() : "U")
+                </span>
+                <span class="fw-medium text-truncate" style="max-width: 160px;">@displayName</span>
+                <span class="badge @badgeClass rounded-pill">@roleBadge</span>
             </a>
-        </li>
-        <li class="nav-item">
-            <form asp-controller="Account" asp-action="Logout" method="post" class="form-inline">
-                <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-            </form>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userMenuDropdown">
+                <li class="dropdown-header">Signed in as <br /><strong>@(currentUser?.Email ?? displayName)</strong></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2" href="@dashboardPath">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3z"/>
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+                @if (User.IsInRole(AppRoles.ServiceProvider))
+                {
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2" asp-controller="ServiceProvider" asp-action="Services">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/>
+                            </svg>
+                            My Offered Services
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2" asp-controller="ServiceProvider" asp-action="Profile">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                            </svg>
+                            Provider Profile
+                        </a>
+                    </li>
+                }
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                        <button type="submit" class="dropdown-item text-danger d-flex align-items-center gap-2">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                            </svg>
+                            Log out
+                        </button>
+                    </form>
+                </li>
+            </ul>
         </li>
     }
     else
     {
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Register</a>
+            <a class="nav-link px-3" asp-controller="Account" asp-action="Register">Register</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Login</a>
+            <a class="btn btn-outline-primary btn-sm px-3 ms-lg-1" asp-controller="Account" asp-action="Login">Log in</a>
         </li>
     }
 </ul>

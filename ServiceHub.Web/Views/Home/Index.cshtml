@@ -2,11 +2,60 @@
     ViewData["Title"] = "Home";
 }
 
-<div class="p-5 mb-4 bg-light rounded-3">
-    <div class="container-fluid py-3">
-        <h1 class="display-5 fw-bold">ServiceHub</h1>
-        <p class="col-md-8 fs-5">Find trusted local services or offer your skills. Create an account to get started.</p>
-        <a class="btn btn-primary btn-lg" asp-controller="Account" asp-action="Register">Create account</a>
-        <a class="btn btn-outline-secondary btn-lg ms-2" asp-controller="Account" asp-action="Login">Log in</a>
+<div class="p-5 mb-4 bg-white rounded-4 shadow-sm border">
+    <div class="container-fluid py-4">
+        <span class="badge bg-primary-subtle text-primary mb-3 px-3 py-2 rounded-pill fw-semibold">
+            Home Services Made Simple
+        </span>
+        <h1 class="display-4 fw-bold text-dark">Find Trusted Local Services or Offer Your Skills</h1>
+        <p class="col-md-9 fs-5 text-muted my-4">
+            ServiceHub connects homeowners and customers with skilled, verified service professionals. Book seamless cleaning, repair, and maintenance services, or grow your independent service business.
+        </p>
+        <div class="d-flex flex-wrap gap-2 mt-4">
+            <a class="btn btn-primary btn-lg px-4" asp-controller="Account" asp-action="Register">Create an account</a>
+            <a class="btn btn-outline-secondary btn-lg px-4" asp-controller="Account" asp-action="Login">Log in</a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 py-2">
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-3">
+            <div class="card-body p-4">
+                <div class="d-inline-flex p-3 bg-primary-subtle text-primary rounded-3 mb-3">
+                    <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/>
+                    </svg>
+                </div>
+                <h3 class="h5 fw-bold">Verified Providers</h3>
+                <p class="text-muted small mb-0">Browse services from experienced professionals in plumbing, electrical work, cleaning, and more.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-3">
+            <div class="card-body p-4">
+                <div class="d-inline-flex p-3 bg-success-subtle text-success rounded-3 mb-3">
+                    <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h1V2z"/>
+                    </svg>
+                </div>
+                <h3 class="h5 fw-bold">Grow Your Business</h3>
+                <p class="text-muted small mb-0">Service providers can manage service offerings, pricing, durations, and availability via dedicated dashboard.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-3">
+            <div class="card-body p-4">
+                <div class="d-inline-flex p-3 bg-info-subtle text-info rounded-3 mb-3">
+                    <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                    </svg>
+                </div>
+                <h3 class="h5 fw-bold">Fast &amp; Responsive</h3>
+                <p class="text-muted small mb-0">Modern asynchronous AJAX workflows and secure authentication provide a smooth experience across devices.</p>
+            </div>
+        </div>
     </div>
 </div>

@@ -1,54 +1,67 @@
 @model IReadOnlyList<ServiceHub.Web.Models.ViewModels.ProviderServiceViewModel>
 @{
     ViewData["Title"] = "My Services";
+    ViewData["HeaderTitle"] = "My Services";
+    ViewData["HeaderSubtitle"] = "Manage, update, and offer your professional services.";
 }
+
+@Html.AntiForgeryToken()
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
-        <a asp-action="Dashboard" class="text-decoration-none">&larr; Dashboard</a>
-        <h1 class="h2 mt-2 mb-0">My services</h1>
+        <a asp-action="Dashboard" class="text-decoration-none text-muted small">&larr; Back to Dashboard</a>
+        <h2 class="h3 mt-1 mb-0">Services Catalog</h2>
     </div>
-    <a asp-action="CreateService" class="btn btn-primary">Add a service</a>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+            </svg>
+            Add a service
+        </button>
+        <a asp-action="CreateService" class="btn btn-outline-secondary d-none d-sm-none">Standard Add</a>
+    </div>
 </div>
 
-@if (TempData["SuccessMessage"] is string successMessage)
-{
-    <div class="alert alert-success" role="status">@successMessage</div>
-}
-@if (TempData["ErrorMessage"] is string errorMessage)
-{
-    <div class="alert alert-danger" role="alert">@errorMessage</div>
-}
-
-@if (Model.Count == 0)
-{
-    <div class="card">
-        <div class="card-body text-center py-5">
-            <h2 class="h4">No services yet</h2>
-            <p class="text-muted">Add the services you offer to manage them here.</p>
-            <a asp-action="CreateService" class="btn btn-primary">Add your first service</a>
+<div id="services-empty-state" class="card shadow-sm border-0 @(Model.Count == 0 ? "" : "d-none")">
+    <div class="card-body text-center py-5">
+        <div class="mb-3 text-muted">
+            <svg width="48" height="48" viewBox="0 0 16 16" fill="currentColor" class="text-secondary opacity-50">
+                <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/>
+            </svg>
         </div>
+        <h2 class="h4">No services yet</h2>
+        <p class="text-muted">Add the services you offer to manage them here.</p>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+            Add your first service
+        </button>
     </div>
-}
-else
-{
+</div>
+
+<div id="services-table-container" class="card shadow-sm border-0 @(Model.Count == 0 ? "d-none" : "")">
     <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead>
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th scope="col">Service</th>
+                    <th scope="col" style="min-width: 200px;">Service</th>
                     <th scope="col">Price</th>
                     <th scope="col">Duration</th>
                     <th scope="col">Status</th>
-                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    <th scope="col" class="text-end" style="min-width: 180px;"><span class="visually-hidden">Actions</span>Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="services-table-body">
                 @foreach (var service in Model)
                 {
-                    <tr>
-                        <th scope="row">@service.ServiceName</th>
-                        <td>@service.Price.ToString("0.00")</td>
+                    <tr id="service-row-@service.Id">
+                        <th scope="row" class="fw-semibold">
+                            <div>@service.ServiceName</div>
+                            @if (!string.IsNullOrWhiteSpace(service.Description))
+                            {
+                                <small class="text-muted text-truncate d-block" style="max-width: 280px;">@service.Description</small>
+                            }
+                        </th>
+                        <td>$@service.Price.ToString("0.00")</td>
                         <td>@service.EstimatedDurationMinutes min</td>
                         <td>
                             <span class="badge @(service.IsActive ? "text-bg-success" : "text-bg-secondary")">
@@ -58,8 +71,8 @@ else
                         <td class="text-end">
                             <div class="btn-group btn-group-sm" role="group" aria-label="Actions for @service.ServiceName">
                                 <a asp-action="ServiceDetails" asp-route-id="@service.Id" class="btn btn-outline-secondary">Details</a>
-                                <a asp-action="EditService" asp-route-id="@service.Id" class="btn btn-outline-primary">Edit</a>
-                                <a asp-action="DeleteService" asp-route-id="@service.Id" class="btn btn-outline-danger">Delete</a>
+                                <button type="button" class="btn btn-outline-primary btn-ajax-edit" data-service-id="@service.Id">Edit</button>
+                                <button type="button" class="btn btn-outline-danger btn-ajax-delete" data-service-id="@service.Id" data-service-name="@service.ServiceName">Delete</button>
                             </div>
                         </td>
                     </tr>
@@ -67,4 +80,76 @@ else
             </tbody>
         </table>
     </div>
+</div>
+
+<!-- Add Service Modal -->
+<div class="modal fade" id="addServiceModal" tabindex="-1" aria-labelledby="addServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title" id="addServiceModalLabel">Add New Service</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addServiceForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body pt-3">
+                    <div class="form-validation-summary alert alert-danger d-none" role="alert"></div>
+                    <partial name="_ServiceFormFields" model="new ServiceHub.Web.Models.ViewModels.ProviderServiceFormViewModel()" />
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4">Add Service</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Service Modal -->
+<div class="modal fade" id="editServiceModal" tabindex="-1" aria-labelledby="editServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title" id="editServiceModalLabel">Edit Service</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editServiceForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="" />
+                <div class="modal-body pt-3">
+                    <div class="form-validation-summary alert alert-danger d-none" role="alert"></div>
+                    <partial name="_ServiceFormFields" model="new ServiceHub.Web.Models.ViewModels.ProviderServiceFormViewModel()" />
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteServiceModal" tabindex="-1" aria-labelledby="deleteServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title text-danger" id="deleteServiceModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-2">
+                <p>Are you sure you want to delete <strong id="deleteServiceNameSpan">this service</strong>?</p>
+                <p class="text-muted small mb-0">This action will permanently remove this offering from your catalog.</p>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Delete Service</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/provider-crud.js" asp-append-version="true"></script>
 }

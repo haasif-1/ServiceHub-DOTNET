@@ -8,47 +8,169 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+:root {
+  --primary-color: #0d6efd;
+  --primary-hover: #0b5ed7;
+  --surface-color: #ffffff;
+  --border-color: #e9ecef;
 }
 
 body {
-  margin-bottom: 60px;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #212529;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-select:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+  border-color: #86b7fe;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+/* User Avatar circle */
+.user-avatar-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e7f1ff;
+  color: #0d6efd;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.85rem;
 }
 
+/* Auth Cards */
 .auth-card {
-  margin: 2rem auto;
-  border: 0;
-  border-radius: 1rem;
-  box-shadow: 0 1rem 2.5rem rgba(20, 42, 75, 0.08) !important;
+  max-width: 480px;
+  margin: 1.5rem auto;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0.85rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.05) !important;
+  background: #fff;
 }
 
 .auth-card .card-body {
-  padding: clamp(1.5rem, 5vw, 2.5rem) !important;
+  padding: clamp(1.5rem, 5vw, 2.25rem) !important;
 }
 
+.auth-brand-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #0d6efd;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+/* Password Visibility Toggle */
+.password-input-group {
+  position: relative;
+}
+
+.password-input-group .form-control {
+  padding-right: 2.75rem;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: #6c757d;
+  padding: 0 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.password-toggle-btn:hover {
+  color: #212529;
+}
+
+.password-toggle-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Dashboard Cards */
 .dashboard-card {
-  max-width: 52rem;
-  margin: 2rem auto;
-  border: 0;
-  border-radius: 1rem;
-  box-shadow: 0 1rem 2.5rem rgba(20, 42, 75, 0.08);
+  max-width: 64rem;
+  margin: 1rem auto;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0.85rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.04);
 }
 
 .dashboard-card .card-body {
-  padding: clamp(1.5rem, 5vw, 2.5rem);
+  padding: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+/* Floating Alerts / Toast style */
+.servicehub-toast {
+  pointer-events: auto;
+  box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.15);
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 0.5rem;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Loading Spinner Button State */
+.btn.is-loading {
+  position: relative;
+  pointer-events: none;
+  color: transparent !important;
+}
+
+.btn.is-loading::after {
+  content: "";
+  position: absolute;
+  width: 1.15rem;
+  height: 1.15rem;
+  top: calc(50% - 0.575rem);
+  left: calc(50% - 0.575rem);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  border-right-color: transparent;
+  animation: spin 0.65s linear infinite;
+}
+
+.btn-outline-primary.is-loading::after,
+.btn-outline-secondary.is-loading::after,
+.btn-light.is-loading::after {
+  border-color: #0d6efd;
+  border-right-color: transparent;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Service item card in grid */
+.service-item-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border-radius: 0.75rem;
+}
+
+.service-item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
 }

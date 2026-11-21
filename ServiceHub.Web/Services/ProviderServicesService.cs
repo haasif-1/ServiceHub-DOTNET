@@ -1,149 +1,57 @@
-using Dapper;
-using ServiceHub.Web.Data;
+using ServiceHub.Web.Data.Repositories.Interfaces;
 using ServiceHub.Web.Models.ViewModels;
 
 namespace ServiceHub.Web.Services;
 
+/// <summary>
+/// Domain service coordinating provider services business logic and repository interactions.
+/// </summary>
 public sealed class ProviderServicesService
 {
-    private readonly IMySqlConnectionFactory _connectionFactory;
+    private readonly IProviderServiceRepository _repository;
 
-    public ProviderServicesService(IMySqlConnectionFactory connectionFactory)
+    public ProviderServicesService(IProviderServiceRepository repository)
     {
-        _connectionFactory = connectionFactory;
+        _repository = repository;
     }
 
-    public async Task<IReadOnlyList<ProviderServiceViewModel>> GetForProviderAsync(
+    public Task<IReadOnlyList<ProviderServiceViewModel>> GetForProviderAsync(
         string providerUserId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
-        const string sql = """
-            SELECT Id, ServiceName, Description, Price, EstimatedDurationMinutes,
-                   IsActive, CreatedAtUtc, UpdatedAtUtc
-            FROM ProviderServices
-            WHERE ProviderUserId = @ProviderUserId
-            ORDER BY CreatedAtUtc DESC, Id DESC;
-            """;
-
-        await using var connection = _connectionFactory.CreateConnection();
-        await connection.OpenAsync(cancellationToken);
-        var services = await connection.QueryAsync<ProviderServiceViewModel>(
-            new CommandDefinition(sql, new { ProviderUserId = providerUserId }, cancellationToken: cancellationToken));
-
-        return services.AsList();
+        return _repository.GetForProviderAsync(providerUserId, cancellationToken);
     }
 
-    public async Task<ProviderServiceViewModel?> GetByIdForProviderAsync(
+    public Task<ProviderServiceViewModel?> GetByIdForProviderAsync(
         long id,
         string providerUserId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
-        const string sql = """
-            SELECT Id, ServiceName, Description, Price, EstimatedDurationMinutes,
-                   IsActive, CreatedAtUtc, UpdatedAtUtc
-            FROM ProviderServices
-            WHERE Id = @Id AND ProviderUserId = @ProviderUserId
-            LIMIT 1;
-            """;
-
-        await using var connection = _connectionFactory.CreateConnection();
-        await connection.OpenAsync(cancellationToken);
-        return await connection.QuerySingleOrDefaultAsync<ProviderServiceViewModel>(
-            new CommandDefinition(
-                sql,
-                new { Id = id, ProviderUserId = providerUserId },
-                cancellationToken: cancellationToken));
+        return _repository.GetByIdForProviderAsync(id, providerUserId, cancellationToken);
     }
 
-    public async Task<long> CreateAsync(
+    public Task<long> CreateAsync(
         string providerUserId,
         ProviderServiceFormViewModel model,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
-        const string sql = """
-            INSERT INTO ProviderServices
-                (ProviderUserId, ServiceName, Description, Price, EstimatedDurationMinutes,
-                 IsActive, CreatedAtUtc, UpdatedAtUtc)
-            VALUES
-                (@ProviderUserId, @ServiceName, @Description, @Price, @EstimatedDurationMinutes,
-                 @IsActive, UTC_TIMESTAMP(6), UTC_TIMESTAMP(6));
-            """;
-
-        await using var connection = _connectionFactory.CreateConnection();
-        await connection.OpenAsync(cancellationToken);
-        await connection.ExecuteAsync(
-            new CommandDefinition(
-                sql,
-                new
-                {
-                    ProviderUserId = providerUserId,
-                    model.ServiceName,
-                    model.Description,
-                    model.Price,
-                    model.EstimatedDurationMinutes,
-                    model.IsActive
-                },
-                cancellationToken: cancellationToken));
-
-        return await connection.ExecuteScalarAsync<long>(
-            new CommandDefinition("SELECT LAST_INSERT_ID();", cancellationToken: cancellationToken));
+        return _repository.CreateForProviderAsync(providerUserId, model, cancellationToken);
     }
 
-    public async Task<bool> UpdateForProviderAsync(
+    public Task<bool> UpdateForProviderAsync(
         long id,
         string providerUserId,
         ProviderServiceFormViewModel model,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
-        const string sql = """
-            UPDATE ProviderServices
-            SET ServiceName = @ServiceName,
-                Description = @Description,
-                Price = @Price,
-                EstimatedDurationMinutes = @EstimatedDurationMinutes,
-                IsActive = @IsActive,
-                UpdatedAtUtc = UTC_TIMESTAMP(6)
-            WHERE Id = @Id AND ProviderUserId = @ProviderUserId;
-            """;
-
-        await using var connection = _connectionFactory.CreateConnection();
-        await connection.OpenAsync(cancellationToken);
-        var affectedRows = await connection.ExecuteAsync(
-            new CommandDefinition(
-                sql,
-                new
-                {
-                    Id = id,
-                    ProviderUserId = providerUserId,
-                    model.ServiceName,
-                    model.Description,
-                    model.Price,
-                    model.EstimatedDurationMinutes,
-                    model.IsActive
-                },
-                cancellationToken: cancellationToken));
-
-        return affectedRows == 1;
+        return _repository.UpdateForProviderAsync(id, providerUserId, model, cancellationToken);
     }
 
-    public async Task<bool> DeleteForProviderAsync(
+    public Task<bool> DeleteForProviderAsync(
         long id,
         string providerUserId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
-        const string sql = """
-            DELETE FROM ProviderServices
-            WHERE Id = @Id AND ProviderUserId = @ProviderUserId;
-            """;
-
-        await using var connection = _connectionFactory.CreateConnection();
-        await connection.OpenAsync(cancellationToken);
-        var affectedRows = await connection.ExecuteAsync(
-            new CommandDefinition(
-                sql,
-                new { Id = id, ProviderUserId = providerUserId },
-                cancellationToken: cancellationToken));
-
-        return affectedRows == 1;
+        return _repository.DeleteForProviderAsync(id, providerUserId, cancellationToken);
     }
 }
